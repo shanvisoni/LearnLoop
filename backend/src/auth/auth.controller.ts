@@ -6,10 +6,12 @@ import {
   Body,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -26,15 +28,13 @@ export class AuthController {
     return this.authService.login(LoginDto);
   }
 
-  @Get('debug/user')
-  debugUser(@Request() req) {
-    console.log('[DEBUG] Full request user object:', req.user);
-    console.log('[DEBUG] User ID:', req.user?._id);
-    console.log('[DEBUG] User type:', typeof req.user?._id);
+  @Get('profile')
+  @UseGuards(JwtAuthGuard)
+  async getProfile(@Request() req) {
+    // req.user comes from the JWT strategy validate method
     return {
+      success: true,
       user: req.user,
-      userId: req.user?._id,
-      userIdType: typeof req.user?._id,
     };
   }
 }
