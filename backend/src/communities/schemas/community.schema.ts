@@ -25,6 +25,9 @@ export class Community {
 
   @Prop({ default: false })
   isPrivate: boolean;
+
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export const CommunitySchema = SchemaFactory.createForClass(Community);

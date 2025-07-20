@@ -541,9 +541,10 @@ export class CommunitiesService {
     if (!Types.ObjectId.isValid(userId)) {
       throw new BadRequestException('Invalid user ID format');
     }
+    const creatorObjectId = new Types.ObjectId(userId);
 
     return this.communityModel
-      .find({ creatorId: userId })
+      .find({ creatorId: creatorObjectId })
       .populate('members', 'username firstName lastName avatar')
       .sort({ createdAt: -1 })
       .exec();
@@ -575,5 +576,82 @@ export class CommunitiesService {
     }
 
     return community.members.some((memberId) => memberId.toString() === userId);
+  }
+
+  async getCommunityMembers(
+    communityId: string,
+    page = 1,
+    limit = 10,
+  ): Promise<{ members: any[]; total: number }> {
+    if (!Types.ObjectId.isValid(communityId)) {
+      throw new BadRequestException('Invalid community ID format');
+    }
+    const community = await this.communityModel
+      .findById(communityId)
+      .populate({
+        path: 'members',
+        select: 'username firstName lastName avatar bio contactInfo',
+        options: {
+          skip: (page - 1) * limit,
+          limit: limit,
+        },
+      })
+      .exec();
+
+    if (!community) {
+      throw new NotFoundException('Community not found');
+    }
+    const total = community.members.length;
+    return { members: community.members, total };
+  }
+  async getCommunityState(communityId: string): Promise<{
+    memberCount: number;
+    postCount: number;
+    isPrivate: boolean;
+    createdAt: Date;
+  }> {
+    if (!Types.ObjectId.isValid(communityId)) {
+      throw new BadRequestException('Invalid community ID format');
+    }
+    const community = await this.communityModel.findById(communityId).exec();
+    if (!community) {
+      throw new NotFoundException('Community not found');
+    }
+    return {
+      memberCount: community.members.length,
+      postCount: community.posts.length,
+      isPrivate: community.isPrivate,
+      createdAt: community.createdAt,
+    };
+  }
+
+  async getMemberProfile(communityId: string, userId: string): Promise<any> {
+    if (
+      !Types.ObjectId.isValid(communityId) ||
+      !Types.ObjectId.isValid(userId)
+    ) {
+      throw new BadRequestException('Invalid Id format');
+    }
+
+    const community = await this.communityModel.findById(communityId).exec();
+    if (!community) {
+      throw new NotFoundException('Community not fount');
+    }
+
+    const isMember = community.members.some(
+      (memberId) => memberId.toString() === userId,
+    );
+    if (!isMember) {
+      throw new NotFoundException('User is not a member of this community');
+    }
+    const user = await this.userModel
+      .findById(userId)
+      .select('username firstName lastName avatar bio contactInfo')
+      .exec();
+
+    if (!user) {
+      throw new NotFoundException('User not fount');
+    }
+    return user;
   }
 }

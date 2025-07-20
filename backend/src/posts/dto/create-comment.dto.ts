@@ -8,9 +8,9 @@ import {
 } from 'class-validator';
 
 export class CreateCommentDto {
-  communityId(communityId: any, userId: string) {
-    throw new Error('Method not implemented.');
-  }
+  // communityId(communityId: any, userId: string) {
+  //   throw new Error('Method not implemented.');
+  // }
   @IsString()
   @IsNotEmpty()
   @MinLength(1, { message: 'Comment cannot be empty' })

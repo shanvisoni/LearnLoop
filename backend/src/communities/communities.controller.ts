@@ -154,6 +154,11 @@ export class CommunitiesController {
     return this.communitiesService.getJoinedCommunities(req.user.id);
   }
 
+  @Get(':id/stats')
+  getCommunityStats(@Param('id') id: string) {
+    return this.communitiesService.getCommunityState(id); // or rename the service method
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.communitiesService.findOne(id);
@@ -182,6 +187,22 @@ export class CommunitiesController {
     return this.communitiesService.remove(id, req.user.id);
   }
 
+  @Post(':id/members')
+  getCommunityMembers(
+    @Param('id') id: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    return this.communitiesService.getCommunityMembers(id, page, limit);
+  }
+
+  @Post(':id/members/:userId')
+  getMemberPriofile(
+    @Param('id') communityId: string,
+    @Param('userId') userId: string,
+  ) {
+    return this.communitiesService.getMemberProfile(communityId, userId);
+  }
   @Post(':id/join')
   @UseGuards(JwtAuthGuard)
   joinCommunity(@Param('id') id: string, @Request() req) {

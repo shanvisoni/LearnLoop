@@ -25,4 +25,6 @@ export const ROUTES = {
   MY_COMMUNITIES: '/communities/my',
   JOINED_COMMUNITIES: '/communities/joined',
   PROFILE: '/profile',
+  FORGOT_PASSWORD: '/forgot-password',
+  RESET_PASSWORD: '/reset-password',
 };

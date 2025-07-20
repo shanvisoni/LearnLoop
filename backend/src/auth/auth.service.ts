@@ -4,7 +4,9 @@ import { UsersService } from '../users/users.services';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { Types } from 'mongoose';
-
+import { randomBytes } from 'crypto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 // @Injectable()
 // export class AuthService {
 //   constructor(
@@ -130,5 +132,27 @@ export class AuthService {
       },
       accessToken,
     };
+  }
+
+  //-------forgot password thing------------------
+  async forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<void> {
+    const { email } = forgotPasswordDto;
+
+    // Generate reset token
+    const resetToken = randomBytes(32).toString('hex');
+
+    // Save token to database
+    await this.usersService.setResetPasswordToken(email, resetToken);
+
+    // Here you would send email with reset link
+    // For now, just log it (implement email service later)
+    console.log(`Reset token for ${email}: ${resetToken}`);
+
+    // Note: Always return success to prevent email enumeration attacks
+  }
+
+  async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<void> {
+    const { token, newPassword } = resetPasswordDto;
+    await this.usersService.resetPassword(token, newPassword);
   }
 }

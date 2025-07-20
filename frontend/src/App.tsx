@@ -7,13 +7,15 @@ import { ROUTES } from './utils/constants';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
+import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import DashboardPage from './pages/dashboard/DashboardPage';
 import TasksPage from './pages/tasks/TasksPage';
-// import CommunitiesPage from './pages/communities/CommunitiesPage';
-// import CommunityDetailPage from './pages/communities/CommunityDetailPage';
-// import CreateCommunityPage from './pages/communities/CreateCommunityPage';
-// import MyCommunitiesPage from './pages/communities/MyCommunitiesPage';
-// import JoinedCommunitiesPage from './pages/communities/JoinedCommunitiesPage';
+import CommunitiesPage from './pages/community/CommunitiesPage';
+import { CommunityDetailPage } from './pages/community/CommunityDetailPage';
+import CreateCommunityPage from './pages/community/CreateCommunityPage';
+import MyCommunitiesPage from './pages/community/MyCommunitiesPage';
+import JoinedCommunitiesPage from './pages/community/JoinedCommunitiesPage';
 // import ProfilePage from './pages/profile/ProfilePage';
 
 // Components
@@ -29,18 +31,21 @@ function App() {
        <Route path={ROUTES.HOME} element={<HomePage/>}/>
        <Route path={ROUTES.LOGIN} element={< LoginPage/>}/>
        <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
-
+       <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
+       <Route path={ROUTES.RESET_PASSWORD} element={<ResetPasswordPage />} />
 {/* Protected Routes */}
        <Route element={<ProtectedRoute/>}>
        <Route element={<Layout />}>
         <Route path={ROUTES.DASHBOARD} element={<DashboardPage/>}/>
          <Route path={ROUTES.TASKS} element={<TasksPage />} />
-            {/*   <Route path={ROUTES.COMMUNITIES} element={<CommunitiesPage />} />
+         
+             <Route path={ROUTES.COMMUNITIES} element={<CommunitiesPage  />} />
               <Route path={ROUTES.COMMUNITY_DETAIL} element={<CommunityDetailPage />} />
               <Route path={ROUTES.CREATE_COMMUNITY} element={<CreateCommunityPage />} />
-              <Route path={ROUTES.MY_COMMUNITIES} element={<MyCommunitiesPage />} />
+                <Route path={ROUTES.MY_COMMUNITIES} element={<MyCommunitiesPage />} />
               <Route path={ROUTES.JOINED_COMMUNITIES} element={<JoinedCommunitiesPage />} />
-              <Route path={ROUTES.PROFILE} element={<ProfilePage />} /> */}
+              
+             {/* <Route path={ROUTES.PROFILE} element={<ProfilePage />} /> */}
        </Route>
        </Route>
       </Routes>

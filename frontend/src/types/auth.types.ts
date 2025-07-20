@@ -35,3 +35,21 @@ export interface AuthResponse {
   user: User;
   accessToken: string;
 }
+
+export interface ForgotPasswordRequest{
+  email:string;
+}
+
+export interface ResetPasswordRequest{
+  token: string;
+  newPassword: string;
+}
+export interface ForgotPasswordResponse{
+  success: boolean;
+  message: string;
+}
+
+export interface ResetPasswordResponse{
+  success:boolean;
+  message:string;
+}

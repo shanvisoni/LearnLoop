@@ -37,6 +37,12 @@ export class User {
     github?: string;
   };
 
+  @Prop()
+  resetPasswordToken?: string;
+
+  @Prop()
+  resetPasswordExpires?: Date;
+
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Community' }] })
   joinedCommunities: Types.ObjectId[];
 

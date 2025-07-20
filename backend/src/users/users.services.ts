@@ -531,4 +531,79 @@ export class UsersService {
   ): Promise<boolean> {
     return bcrypt.compare(plainPassword, hashedPassword);
   }
+
+  //----------------------------forgot password stuff------------------------
+  // users.service.ts - add these methods
+  // async setResetPasswordToken(email: string, token: string): Promise<void> {
+  //   const user = await this.userModel.findOne({ email });
+  //   if (!user) {
+  //     throw new NotFoundException('User not found');
+  //   }
+
+  //   user.resetPasswordToken = token;
+  //   user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour from now
+  //   await user.save();
+  // }
+
+  async findByResetToken(token: string): Promise<User | null> {
+    return this.userModel.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: new Date() }, // Token not expired
+    });
+  }
+
+  // async resetPassword(token: string, newPassword: string): Promise<void> {
+  //   const user = await this.findByResetToken(token);
+  //   if (!user) {
+  //     throw new UnauthorizedException('Invalid or expired reset token');
+  //   }
+
+  //   // Hash new password
+  //   const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || '12');
+  //   const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+  //   // Update password and clear reset token
+  //   user.password = hashedPassword;
+  //   user.resetPasswordToken = undefined;
+  //   user.resetPasswordExpires = undefined;
+  //   await user.save();
+  // }
+
+  async setResetPasswordToken(email: string, token: string): Promise<void> {
+    const result = await this.userModel.findOneAndUpdate(
+      { email },
+      {
+        resetPasswordToken: token,
+        resetPasswordExpires: new Date(Date.now() + 3600000),
+      },
+      { new: true },
+    );
+
+    if (!result) {
+      throw new NotFoundException('User not found');
+    }
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    const user = await this.findByResetToken(token);
+    if (!user) {
+      throw new UnauthorizedException('Invalid or expired reset token');
+    }
+
+    // Hash new password
+    const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || '12');
+    const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+    const userId = (user as any)._id.toString();
+    // Update password and clear reset token using findOneAndUpdate
+    await this.userModel.findOneAndUpdate(
+      { _id: userId },
+      {
+        password: hashedPassword,
+        $unset: {
+          resetPasswordToken: 1,
+          resetPasswordExpires: 1,
+        },
+      },
+    );
+  }
 }

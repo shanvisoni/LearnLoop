@@ -23,7 +23,8 @@ export class PostsController {
   @Post()
   @UseGuards(JwtAuthGuard)
   create(@Body() createPostDto: CreatePostDto, @Request() req) {
-    return this.postsService.create(createPostDto, req.user.userId);
+    // return this.postsService.create(createPostDto, req.user.userId);
+    return this.postsService.create(createPostDto, req.user.id);
   }
 
   @Get('community/:communityId')
