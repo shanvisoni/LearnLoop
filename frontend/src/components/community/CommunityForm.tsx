@@ -4,7 +4,7 @@ import { Button } from '../ui/button';
 import { Card } from '../ui/card';
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea"
-import { useCreateCommunity, useUpdateCommunity } from '../../hooks/useCommunities';
+import {  useUpdateCommunity } from '../../hooks/useCommunities';
 import type { CreateCommunityDto, UpdateCommunityDto, Community } from '../../types/community.types';
 
 interface CommunityFormProps {
