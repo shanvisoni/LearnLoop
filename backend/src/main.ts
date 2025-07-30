@@ -24,9 +24,9 @@ async function bootstrap() {
 
   // Add global prefix
   app.setGlobalPrefix('api');
-  app.use('', (req, res) => {
-    res.send('Welcome to the backend API');
-  });
+  // app.use('', (req, res) => {
+  //   res.send('Welcome to the backend API');
+  // });
   await app.listen(process.env.PORT || 3001);
 }
 bootstrap();
