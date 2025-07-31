@@ -6,6 +6,8 @@ import { UsersModule } from './users/user.module';
 import { TasksModule } from './tasks/task.module';
 import { CommunitiesModule } from './communities/communities.module';
 import { PostsModule } from './posts/posts.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -26,5 +28,7 @@ import { PostsModule } from './posts/posts.module';
     CommunitiesModule,
     PostsModule,
   ],
+  controllers: [AppController], // Add this
+  providers: [AppService],
 })
 export class AppModule {}
