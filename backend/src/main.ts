@@ -23,7 +23,7 @@ async function bootstrap() {
   );
 
   // Add global prefix
-  app.setGlobalPrefix('api');
+  // app.setGlobalPrefix('api');
   // app.use('', (req, res) => {
   //   res.send('Welcome to the backend API');
   // });
