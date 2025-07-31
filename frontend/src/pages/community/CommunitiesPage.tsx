@@ -75,15 +75,15 @@ const CommunitiesPage: React.FC = () => {
   const currentUserId = localStorage.getItem('userId') || undefined;
 
   // Handle join/leave callbacks
-  const handleJoin = (communityId: string) => {
-    console.log('Joined community:', communityId);
-    // Optionally trigger a refetch or update local state
-  };
+  // const handleJoin = (communityId: string) => {
+  //   console.log('Joined community:', communityId);
+  //   // Optionally trigger a refetch or update local state
+  // };
 
-  const handleLeave = (communityId: string) => {
-    console.log('Left community:', communityId);
-    // Optionally trigger a refetch or update local state
-  };
+  // const handleLeave = (communityId: string) => {
+  //   console.log('Left community:', communityId);
+  //   // Optionally trigger a refetch or update local state
+  // };
 
   // Pagination handlers
   const goToPage = (page: number) => {
@@ -193,8 +193,8 @@ const CommunitiesPage: React.FC = () => {
             communities={currentCommunities}
             isLoading={isLoading}
             currentUserId={currentUserId}
-            onJoin={handleJoin}
-            onLeave={handleLeave}
+            // onJoin={handleJoin}
+            // onLeave={handleLeave}
             showActions={true}
             emptyMessage={
               searchQuery || selectedTags.length > 0 || !showPrivate

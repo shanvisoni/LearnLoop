@@ -14,6 +14,6 @@ export class UserProfileDto {
   };
   joinedCommunities: string[];
   createdCommunities: string[];
-  createdAt?: Date; // Make optional if needed
-  updatedAt?: Date; // Make optional if needed
+  createdAt?: Date;
+  updatedAt?: Date;
 }

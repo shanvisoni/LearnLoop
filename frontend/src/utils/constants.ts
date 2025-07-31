@@ -1,5 +1,7 @@
-// export const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
-export const API_BASE_URL =  'http://localhost:3001/api';
+ export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+// export const API_BASE_URL =  'http://localhost:3001';
+console.log("API_BASE_URL:", import.meta.env.VITE_API_URL);
+
 
 export const TASK_STATUS = {
   PENDING: 'pending',
@@ -23,6 +25,7 @@ export const ROUTES = {
   COMMUNITY_DETAIL: '/communities/:id',
   CREATE_COMMUNITY: '/communities/create',
   MY_COMMUNITIES: '/communities/my',
+  EDIT_MY_COMMUNITY:'/communities/:id/edit',
   JOINED_COMMUNITIES: '/communities/joined',
   PROFILE: '/profile',
   FORGOT_PASSWORD: '/forgot-password',

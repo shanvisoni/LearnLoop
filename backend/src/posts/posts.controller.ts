@@ -42,7 +42,8 @@ export class PostsController {
     @Query('page') page?: number,
     @Query('limit') limit?: number,
   ) {
-    return this.postsService.getUserPosts(req.user.userId, page, limit);
+    // return this.postsService.getUserPosts(req.user.userId, page, limit);
+    return this.postsService.getUserPosts(req.user.id, page, limit);
   }
 
   @Get(':id')
@@ -57,19 +58,22 @@ export class PostsController {
     @Body() updatePostDto: UpdatePostDto,
     @Request() req,
   ) {
-    return this.postsService.update(id, updatePostDto, req.user.userId);
+    // return this.postsService.update(id, updatePostDto, req.user.userId);
+    return this.postsService.update(id, updatePostDto, req.user.id);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   remove(@Param('id') id: string, @Request() req) {
-    return this.postsService.remove(id, req.user.userId);
+    // return this.postsService.remove(id, req.user.userId);
+    return this.postsService.remove(id, req.user.id);
   }
 
   @Post(':id/like')
   @UseGuards(JwtAuthGuard)
   toggleLike(@Param('id') id: string, @Request() req) {
-    return this.postsService.toggleLike(id, req.user.userId);
+    // return this.postsService.toggleLike(id, req.user.userId);
+    return this.postsService.toggleLike(id, req.user.id);
   }
 
   @Post(':id/comment')
@@ -79,7 +83,8 @@ export class PostsController {
     @Body() createCommentDto: CreateCommentDto,
     @Request() req,
   ) {
-    return this.postsService.addComment(id, createCommentDto, req.user.userId);
+    // return this.postsService.addComment(id, createCommentDto, req.user.userId);
+    return this.postsService.addComment(id, createCommentDto, req.user.id);
   }
 
   @Delete(':id/comment/:commentId')
@@ -89,6 +94,7 @@ export class PostsController {
     @Param('commentId') commentId: string,
     @Request() req,
   ) {
-    return this.postsService.removeComment(id, commentId, req.user.userId);
+    // return this.postsService.removeComment(id, commentId, req.user.userId);
+    return this.postsService.removeComment(id, commentId, req.user.id);
   }
 }

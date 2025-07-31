@@ -77,7 +77,7 @@ const Navbar = () => {
               <BookOpen className="h-5 w-5 text-white" />
             </div>
             <span className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              StudyTracker
+              Reactify
             </span>
           </Link>
 

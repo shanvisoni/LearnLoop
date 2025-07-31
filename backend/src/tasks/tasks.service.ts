@@ -2,6 +2,7 @@
 //   Injectable,
 //   NotFoundException,
 //   ForbiddenException,
+//   Logger,
 // } from '@nestjs/common';
 // import { InjectModel } from '@nestjs/mongoose';
 // import { Model, Types } from 'mongoose';
@@ -9,50 +10,48 @@
 // import { CreateTaskDto } from './dto/create-task.dto';
 // import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
 // import { UpdateTaskDto } from './dto/update-task.dto';
+// import { ERROR_MESSAGES } from 'src/common/constants/error-messages.constants';
 
 // @Injectable()
 // export class TasksService {
+//   private readonly logger = new Logger(TasksService.name);
+
 //   constructor(@InjectModel(Task.name) private taskModel: Model<TaskDocument>) {}
 
-//   // async create(createTaskDto: CreateTaskDto, userId: string): Promise<Task> {
-//   //   console.log('=== SERVICE DEBUG ===');
-//   //   console.log('Received userId:', userId);
-//   //   console.log('UserId type:', typeof userId);
-//   //   console.log('==================');
-
-//   //   const createdTask = new this.taskModel({
-//   //     ...createTaskDto,
-//   //      userId,
-
-//   //   });
-//   //   return createdTask.save();
-//   // }
 //   async create(createTaskDto: CreateTaskDto, userId: string): Promise<Task> {
-//     console.log('=== SERVICE DEBUG ===');
-//     console.log('Received userId:', userId);
-//     console.log('UserId type:', typeof userId);
-//     console.log('==================');
+
+//     if (!userId) {
+//       throw new Error('User ID is required');
+//     }
+
+//     if (!Types.ObjectId.isValid(userId)) {
+//       throw new Error('Invalid user ID format');
+//     }
 
 //     const userObjectId = new Types.ObjectId(userId);
-//     console.log('Converted ObjectId:', userObjectId.toString());
 
 //     const createdTask = new this.taskModel({
 //       ...createTaskDto,
 //       userId: userObjectId,
 //     });
-//     return createdTask.save();
+
+//     const savedTask = await createdTask.save();
+//     return savedTask;
 //   }
 
 //   async findAllByUser(userId: string): Promise<Task[]> {
-//     return this.taskModel.find({ userId }).sort({ createdAt: -1 }).exec();
+//     const userObjectId = new Types.ObjectId(userId);
+//     return this.taskModel
+//       .find({ userId: userObjectId })
+//       .sort({ createdAt: -1 })
+//       .exec();
 //   }
 
 //   async findOne(
 //     id: string,
 //     userId: string | Types.ObjectId,
 //   ): Promise<TaskDocument> {
-//     console.log('[DEBUG] Finding task with id:', id);
-//     console.log('[DEBUG] User ID:', userId);
+
 //     const task = await this.taskModel.findById(id).exec();
 
 //     if (!task) {
@@ -62,8 +61,7 @@
 //     const taskUserId = task.userId.toString();
 //     const requestUserId =
 //       userId instanceof Types.ObjectId ? userId.toString() : userId;
-//     console.log('[DEBUG] Task userId (string):', taskUserId);
-//     console.log('[DEBUG] Request userId (string):', requestUserId);
+
 //     if (taskUserId !== requestUserId) {
 //       throw new ForbiddenException('Access denied');
 //     }
@@ -76,15 +74,12 @@
 //     updateTaskDto: UpdateTaskDto,
 //     userId: string | Types.ObjectId,
 //   ): Promise<TaskDocument> {
-//     console.log('[DEBUG] Updating task with id:', id);
-//     console.log('[DEBUG] Update data:', updateTaskDto);
-//     console.log('[DEBUG] User ID:', userId);
 //     const task = await this.findOne(id, userId);
 
 //     const updatedTask = await this.taskModel
 //       .findByIdAndUpdate(id, updateTaskDto, { new: true, runValidators: true })
 //       .exec();
-//     console.log('[DEBUG] Updated task:', updatedTask);
+//     this.logger.log('[DEBUG] Updated task:', updatedTask);
 //     if (!updatedTask) {
 //       throw new NotFoundException('Task not found');
 //     }
@@ -92,14 +87,24 @@
 //   }
 
 //   async updateStatus(
-//     id: string,
-//     updateTaskStatusDto: UpdateTaskStatusDto,
+//     taskId: string,
+//     updateData: UpdateTaskStatusDto,
 //     userId: string,
-//   ): Promise<Task> {
-//     const task = await this.findOne(id, userId);
+//   ) {
+//     const updatedTask = await this.taskModel.findOneAndUpdate(
+//       {
+//         _id: new Types.ObjectId(taskId),
+//         userId: new Types.ObjectId(userId),
+//       },
+//       { status: updateData.status },
+//       { new: true },
+//     );
 
-//     task.status = updateTaskStatusDto.status;
-//     return task.save();
+//     if (!updatedTask) {
+//       throw new NotFoundException('Task not found or not owned by user');
+//     }
+
+//     return updatedTask;
 //   }
 
 //   async remove(id: string, userId: string): Promise<void> {
@@ -108,7 +113,8 @@
 //   }
 
 //   async getTaskStats(userId: string) {
-//     const tasks = await this.taskModel.find({ userId }).exec();
+//     const userObjectId = new Types.ObjectId(userId);
+//     const tasks = await this.taskModel.find({ userId: userObjectId }).exec();
 
 //     const stats = {
 //       total: tasks.length,
@@ -126,6 +132,7 @@ import {
   NotFoundException,
   ForbiddenException,
   Logger,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
@@ -133,6 +140,7 @@ import { Task, TaskDocument } from './schemas/task.schema';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { ERROR_MESSAGES } from 'src/common/constants/error-messages.constants';
 
 @Injectable()
 export class TasksService {
@@ -141,70 +149,71 @@ export class TasksService {
   constructor(@InjectModel(Task.name) private taskModel: Model<TaskDocument>) {}
 
   async create(createTaskDto: CreateTaskDto, userId: string): Promise<Task> {
-    // 🚨 CRITICAL: Force logging to work
-    this.logger.error('=== SERVICE DEBUG ===');
-    this.logger.error(`Received userId: ${userId}`);
-    this.logger.error(`UserId type: ${typeof userId}`);
-    this.logger.error('==================');
-
-    // Also try console.error and process.stdout
-    console.error('Console ERROR - Received userId:', userId);
-    process.stdout.write(`STDOUT SERVICE - userId: ${userId}\n`);
-
-    // 🚨 CRITICAL: Check if userId is valid before conversion
     if (!userId) {
-      this.logger.error('ERROR: userId is undefined or null!');
-      throw new Error('User ID is required');
+      throw new BadRequestException(ERROR_MESSAGES.INVALID_REQUEST);
     }
 
     if (!Types.ObjectId.isValid(userId)) {
-      this.logger.error(`ERROR: Invalid userId format: ${userId}`);
-      throw new Error('Invalid user ID format');
+      throw new BadRequestException(ERROR_MESSAGES.INVALID_REQUEST);
     }
 
     const userObjectId = new Types.ObjectId(userId);
-    this.logger.error(`Converted ObjectId: ${userObjectId.toString()}`);
 
-    const createdTask = new this.taskModel({
-      ...createTaskDto,
-      userId: userObjectId,
-    });
-
-    const savedTask = await createdTask.save();
-    this.logger.error(`Saved task userId: ${savedTask.userId.toString()}`);
-    return savedTask;
+    try {
+      const createdTask = new this.taskModel({
+        ...createTaskDto,
+        userId: userObjectId,
+      });
+      return await createdTask.save();
+    } catch (error) {
+      this.logger.error(`Error creating task: ${error.message}`);
+      throw new Error(ERROR_MESSAGES.INTERNAL_SERVER_ERROR);
+    }
   }
 
   async findAllByUser(userId: string): Promise<Task[]> {
-    const userObjectId = new Types.ObjectId(userId);
-    return this.taskModel
-      .find({ userId: userObjectId })
-      .sort({ createdAt: -1 })
-      .exec();
+    try {
+      const userObjectId = new Types.ObjectId(userId);
+      return await this.taskModel
+        .find({ userId: userObjectId })
+        .sort({ createdAt: -1 })
+        .exec();
+    } catch (error) {
+      this.logger.error(`Error finding tasks for user: ${error.message}`);
+      throw new Error(ERROR_MESSAGES.INTERNAL_SERVER_ERROR);
+    }
   }
 
   async findOne(
     id: string,
     userId: string | Types.ObjectId,
   ): Promise<TaskDocument> {
-    this.logger.log('[DEBUG] Finding task with id:', id);
-    this.logger.log('[DEBUG] User ID:', userId);
-    const task = await this.taskModel.findById(id).exec();
+    try {
+      const task = await this.taskModel.findById(id).exec();
 
-    if (!task) {
-      throw new NotFoundException('Task not found');
+      if (!task) {
+        throw new NotFoundException(ERROR_MESSAGES.TASK_NOT_FOUND);
+      }
+
+      const taskUserId = task.userId.toString();
+      const requestUserId =
+        userId instanceof Types.ObjectId ? userId.toString() : userId;
+
+      if (taskUserId !== requestUserId) {
+        throw new ForbiddenException(ERROR_MESSAGES.TASK_ACCESS_DENIED);
+      }
+
+      return task;
+    } catch (error) {
+      this.logger.error(`Error finding task: ${error.message}`);
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ForbiddenException
+      ) {
+        throw error;
+      }
+      throw new Error(ERROR_MESSAGES.INTERNAL_SERVER_ERROR);
     }
-
-    const taskUserId = task.userId.toString();
-    const requestUserId =
-      userId instanceof Types.ObjectId ? userId.toString() : userId;
-    this.logger.log('[DEBUG] Task userId (string):', taskUserId);
-    this.logger.log('[DEBUG] Request userId (string):', requestUserId);
-    if (taskUserId !== requestUserId) {
-      throw new ForbiddenException('Access denied');
-    }
-
-    return task;
   }
 
   async update(
@@ -212,69 +221,97 @@ export class TasksService {
     updateTaskDto: UpdateTaskDto,
     userId: string | Types.ObjectId,
   ): Promise<TaskDocument> {
-    this.logger.log('[DEBUG] Updating task with id:', id);
-    this.logger.log('[DEBUG] Update data:', updateTaskDto);
-    this.logger.log('[DEBUG] User ID:', userId);
-    const task = await this.findOne(id, userId);
+    try {
+      await this.findOne(id, userId); // This will verify ownership
 
-    const updatedTask = await this.taskModel
-      .findByIdAndUpdate(id, updateTaskDto, { new: true, runValidators: true })
-      .exec();
-    this.logger.log('[DEBUG] Updated task:', updatedTask);
-    if (!updatedTask) {
-      throw new NotFoundException('Task not found');
+      const updatedTask = await this.taskModel
+        .findByIdAndUpdate(id, updateTaskDto, {
+          new: true,
+          runValidators: true,
+        })
+        .exec();
+
+      if (!updatedTask) {
+        throw new NotFoundException(ERROR_MESSAGES.TASK_NOT_FOUND);
+      }
+
+      return updatedTask;
+    } catch (error) {
+      this.logger.error(`Error updating task: ${error.message}`);
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ForbiddenException
+      ) {
+        throw error;
+      }
+      throw new Error(ERROR_MESSAGES.TASK_UPDATE_FAILED);
     }
-    return updatedTask;
   }
-
-  // async updateStatus(
-  //   id: string,
-  //   updateTaskStatusDto: UpdateTaskStatusDto,
-  //   userId: string,
-  // ): Promise<Task> {
-  //   const task = await this.findOne(id, userId);
-
-  //   task.status = updateTaskStatusDto.status;
-  //   return task.save();
-  // }
 
   async updateStatus(
     taskId: string,
     updateData: UpdateTaskStatusDto,
     userId: string,
   ) {
-    const updatedTask = await this.taskModel.findOneAndUpdate(
-      {
-        _id: new Types.ObjectId(taskId),
-        userId: new Types.ObjectId(userId),
-      },
-      { status: updateData.status },
-      { new: true },
-    );
+    try {
+      const updatedTask = await this.taskModel.findOneAndUpdate(
+        {
+          _id: new Types.ObjectId(taskId),
+          userId: new Types.ObjectId(userId),
+        },
+        { status: updateData.status },
+        { new: true },
+      );
 
-    if (!updatedTask) {
-      throw new NotFoundException('Task not found or not owned by user');
+      if (!updatedTask) {
+        throw new NotFoundException(ERROR_MESSAGES.TASK_NOT_FOUND);
+      }
+
+      return updatedTask;
+    } catch (error) {
+      this.logger.error(`Error updating task status: ${error.message}`);
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new Error(ERROR_MESSAGES.TASK_UPDATE_FAILED);
     }
-
-    return updatedTask;
   }
 
   async remove(id: string, userId: string): Promise<void> {
-    const task = await this.findOne(id, userId);
-    await this.taskModel.findByIdAndDelete(id).exec();
+    try {
+      await this.findOne(id, userId); // This will verify ownership
+      const result = await this.taskModel.findByIdAndDelete(id).exec();
+
+      if (!result) {
+        throw new NotFoundException(ERROR_MESSAGES.TASK_NOT_FOUND);
+      }
+    } catch (error) {
+      this.logger.error(`Error deleting task: ${error.message}`);
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ForbiddenException
+      ) {
+        throw error;
+      }
+      throw new Error(ERROR_MESSAGES.TASK_DELETE_FAILED);
+    }
   }
 
   async getTaskStats(userId: string) {
-    const userObjectId = new Types.ObjectId(userId);
-    const tasks = await this.taskModel.find({ userId: userObjectId }).exec();
+    try {
+      const userObjectId = new Types.ObjectId(userId);
+      const tasks = await this.taskModel.find({ userId: userObjectId }).exec();
 
-    const stats = {
-      total: tasks.length,
-      pending: tasks.filter((task) => task.status === 'pending').length,
-      inProgress: tasks.filter((task) => task.status === 'in_progress').length,
-      completed: tasks.filter((task) => task.status === 'completed').length,
-    };
-
-    return stats;
+      return {
+        total: tasks.length,
+        pending: tasks.filter((task) => task.status === 'pending').length,
+        inProgress: tasks.filter((task) => task.status === 'in_progress')
+          .length,
+        completed: tasks.filter((task) => task.status === 'completed').length,
+      };
+    } catch (error) {
+      this.logger.error(`Error getting task stats: ${error.message}`);
+      throw new Error(ERROR_MESSAGES.INTERNAL_SERVER_ERROR);
+    }
   }
 }

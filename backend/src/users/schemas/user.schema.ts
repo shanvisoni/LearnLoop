@@ -16,6 +16,12 @@ export class User {
   @Prop()
   lastName?: string;
 
+  // @Prop({ required: true })
+  // country: string;
+
+  // @Prop({ required: true, uppercase: true })
+  // countryCode: string;
+
   @Prop()
   bio?: string;
 
@@ -37,11 +43,11 @@ export class User {
     github?: string;
   };
 
-  @Prop()
-  resetPasswordToken?: string;
+  // @Prop()
+  // resetPasswordToken?: string;
 
-  @Prop()
-  resetPasswordExpires?: Date;
+  // @Prop()
+  // resetPasswordExpires?: Date;
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Community' }] })
   joinedCommunities: Types.ObjectId[];

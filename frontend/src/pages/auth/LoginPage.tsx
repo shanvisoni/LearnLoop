@@ -68,7 +68,7 @@ const LoginPage = () => {
               <BookOpen className="h-6 w-6 text-white" />
             </div>
             <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              StudyTracker
+              Reactify
             </span>
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mt-6 mb-2">
@@ -150,14 +150,14 @@ const LoginPage = () => {
               </div>
 
               {/* Forgot Password */}
-              <div className="text-right">
+              {/* <div className="text-right">
                 <Link
     to={ROUTES.FORGOT_PASSWORD}
     className="text-sm text-blue-600 hover:text-blue-800 font-medium"
   >
     Forgot password?
   </Link>
-              </div>
+              </div> */}
 
               {/* Submit Button */}
               <Button

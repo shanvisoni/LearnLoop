@@ -81,6 +81,18 @@ const TaskPage: React.FC = () => {
     }
   };
 
+//   const handleCreateTask = async (taskData: CreateTaskRequest | UpdateTaskRequest) => {
+//   try {
+//     console.log('handleCreateTask called with:', taskData); // Debug log
+//     await createTask(taskData as CreateTaskRequest);
+//     console.log('Task created successfully, closing modal'); // Debug log
+//     setIsCreateModalOpen(false);
+//   } catch (err) {
+//     console.error('Failed to create task:', err);
+//     // Don't close modal on error so user can retry
+//     // You might want to show an error message to the user here
+//   }
+// };
   const handleUpdateTask = async (taskData: UpdateTaskRequest) => {
     if (!selectedTask) return;
     
@@ -93,6 +105,20 @@ const TaskPage: React.FC = () => {
     }
   };
 
+//   const handleUpdateTask = async (taskData: UpdateTaskRequest) => {
+//   if (!selectedTask) return;
+  
+//   try {
+//     console.log('handleUpdateTask called with:', taskData); // Debug log
+//     await updateTask(selectedTask._id, taskData);
+//     console.log('Task updated successfully, closing modal'); // Debug log
+//     setIsEditModalOpen(false);
+//     setSelectedTask(null);
+//   } catch (err) {
+//     console.error('Failed to update task:', err);
+//     // Don't close modal on error so user can retry
+//   }
+// };
   const handleDeleteTask = async (taskId: string) => {
     try {
       await deleteTask(taskId);
@@ -449,6 +475,19 @@ const TaskCard: React.FC<{
 };
 
 // Task Modal Component
+// const TaskModal: React.FC<{
+//   title: string;
+//   task?: Task;
+//   onClose: () => void;
+//   onSubmit: (task: CreateTaskRequest | UpdateTaskRequest) => void;
+// }> = ({ title, task, onClose, onSubmit }) => {
+//   const [formData, setFormData] = useState({
+//     title: task?.title || '',
+//     description: task?.description || '',
+//     priority: task?.priority || TaskPriority.MEDIUM,
+//     dueDate: task?.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '',
+//   });
+
 const TaskModal: React.FC<{
   title: string;
   task?: Task;
@@ -461,20 +500,68 @@ const TaskModal: React.FC<{
     priority: task?.priority || TaskPriority.MEDIUM,
     dueDate: task?.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '',
   });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+   const [isSubmitting, setIsSubmitting] = useState(false);
+  // const handleSubmit = (e: React.FormEvent) => {
+  //   e.preventDefault();
     
-    const submitData = {
-      title: formData.title,
-      description: formData.description || undefined,
-      priority: formData.priority,
-      dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
-    };
+  //   const submitData = {
+  //     title: formData.title,
+  //     description: formData.description || undefined,
+  //     priority: formData.priority,
+  //     dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
+  //   };
 
-    onSubmit(submitData);
+  //   onSubmit(submitData);
+  // };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    e.stopPropagation(); // Prevent event bubbling
+    
+    // Prevent multiple submissions
+    if (isSubmitting) {
+      return;
+    }
+    
+    // Basic validation
+    if (!formData.title.trim()) {
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      const submitData = {
+        title: formData.title.trim(),
+        description: formData.description.trim() || undefined,
+        priority: formData.priority,
+        dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
+      };
+      
+      await onSubmit(submitData);
+    } catch (error) {
+      console.error('Form submission error:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+//  const handleBackdropClick = (e: React.MouseEvent) => {
+//     if (e.target === e.currentTarget) {
+//       onClose();
+//     }
+//   };
 
+  // Handle escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [onClose])
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">

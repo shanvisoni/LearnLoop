@@ -131,26 +131,133 @@ export const useJoinedCommunities = () => {
   return useQuery<Community[]>({
     queryKey: ['joinedCommunities'],
     queryFn: () => communityService.getJoinedCommunities(),
+    staleTime: 1000 * 60 * 5,
   });
 };
 
-// Join/Leave Community hooks
 export const useJoinCommunity = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (id: string) => communityService.joinCommunity(id),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['community', data._id] });
-      queryClient.invalidateQueries({ queryKey: ['joinedCommunities'] });
-      queryClient.invalidateQueries({ queryKey: ['communities'] });
-      toast.success('Joined community successfully!');
+    mutationFn: (id: string) => {
+      console.log('Mutation function called with ID:', id);
+      return communityService.joinCommunity(id);
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || 'Failed to join community');
+    onMutate: (id: string) => {
+      console.log('Join mutation starting for community:', id);
     },
+    onSuccess: (data, variables) => {
+      console.log('Join mutation successful:', { data, communityId: variables });
+      
+      // Invalidate and refetch relevant queries
+      queryClient.invalidateQueries({ 
+        queryKey: ['community', data._id],
+        exact: true 
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: ['joinedCommunities'],
+        exact: true 
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: ['communities'],
+        refetchType: 'active'
+      });
+      
+      toast.success('Successfully joined the community!');
+    },
+    onError: (error: any, variables) => {
+      console.error('Join mutation failed:', { 
+        error, 
+        communityId: variables,
+        errorMessage: error?.message 
+      });
+      
+      // Show user-friendly error message
+      const errorMessage = error?.message || 'Failed to join community. Please try again.';
+      toast.error(errorMessage);
+    },
+    onSettled: ( error, variables) => {
+      console.log('Join mutation completed:', { 
+        success: !error, 
+        communityId: variables 
+      });
+    }
   });
 };
+
+// export const useJoinCommunity = () => {
+//   const queryClient = useQueryClient();
+  
+//   return useMutation({
+//     mutationFn: (id: string) => {
+//       console.log('Mutation function called with ID:', id);
+//       return communityService.joinCommunity(id);
+//     },
+//     onMutate: async (communityId: string) => {
+//       console.log('Join mutation starting for community:', communityId);
+      
+//       // Cancel any outgoing refetches (to avoid overwriting our optimistic update)
+//       await queryClient.cancelQueries({ queryKey: ['joinedCommunities'] });
+//       await queryClient.cancelQueries({ queryKey: ['communities'] });
+      
+//       // Snapshot the previous values
+//       const previousJoinedCommunities = queryClient.getQueryData<Community[]>(['joinedCommunities']);
+      
+//       // Optimistically update joined communities if we have the community data
+//       const allCommunitiesData = queryClient.getQueryData<any>(['communities']);
+//       if (allCommunitiesData?.communities) {
+//         const communityToJoin = allCommunitiesData.communities.find((c: Community) => c._id === communityId);
+//         if (communityToJoin && previousJoinedCommunities) {
+//           queryClient.setQueryData(['joinedCommunities'], [...previousJoinedCommunities, communityToJoin]);
+//         }
+//       }
+      
+//       return { previousJoinedCommunities };
+//     },
+//     onSuccess: (data, communityId) => {
+//       console.log('Join mutation successful:', { data, communityId });
+      
+//       // Update the specific community data
+//       queryClient.setQueryData(['community', data._id], data);
+      
+//       // Invalidate and refetch to ensure consistency
+//       queryClient.invalidateQueries({
+//         queryKey: ['joinedCommunities'],
+//         exact: true
+//       });
+      
+//       // Update all communities cache to reflect new member count
+//       queryClient.invalidateQueries({
+//         queryKey: ['communities'],
+//         refetchType: 'active'
+//       });
+      
+//       toast.success('Successfully joined the community!');
+//     },
+//     onError: (error: any, communityId, context) => {
+//       console.error('Join mutation failed:', {
+//         error,
+//         communityId,
+//         errorMessage: error?.message
+//       });
+      
+//       // Revert optimistic updates
+//       if (context?.previousJoinedCommunities) {
+//         queryClient.setQueryData(['joinedCommunities'], context.previousJoinedCommunities);
+//       }
+      
+//       // Show user-friendly error message
+//       const errorMessage = error?.response?.data?.message || error?.message || 'Failed to join community. Please try again.';
+//       toast.error(errorMessage);
+//     },
+//     onSettled: (data, error, communityId) => {
+//       console.log('Join mutation completed:', {
+//         success: !error,
+//         communityId
+//       });
+//     }
+//   });
+// };
 
 export const useLeaveCommunity = () => {
   const queryClient = useQueryClient();
@@ -169,7 +276,79 @@ export const useLeaveCommunity = () => {
   });
 };
 
+
 // Post hooks
+
+// export const useLeaveCommunity = () => {
+//   const queryClient = useQueryClient();
+  
+//   return useMutation({
+//     mutationFn: (id: string) => {
+//       console.log('Leave mutation function called with ID:', id);
+//       return communityService.leaveCommunity(id);
+//     },
+//     onMutate: async (communityId: string) => {
+//       console.log('Leave mutation starting for community:', communityId);
+      
+//       // Cancel any outgoing refetches
+//       await queryClient.cancelQueries({ queryKey: ['joinedCommunities'] });
+//       await queryClient.cancelQueries({ queryKey: ['communities'] });
+      
+//       // Snapshot the previous values
+//       const previousJoinedCommunities = queryClient.getQueryData<Community[]>(['joinedCommunities']);
+      
+//       // Optimistically remove from joined communities
+//       if (previousJoinedCommunities) {
+//         const updatedJoinedCommunities = previousJoinedCommunities.filter(c => c._id !== communityId);
+//         queryClient.setQueryData(['joinedCommunities'], updatedJoinedCommunities);
+//       }
+      
+//       return { previousJoinedCommunities };
+//     },
+//     onSuccess: (data, communityId) => {
+//       console.log('Leave mutation successful:', { data, communityId });
+      
+//       // Update the specific community data
+//       queryClient.setQueryData(['community', data._id], data);
+      
+//       // Invalidate and refetch to ensure consistency
+//       queryClient.invalidateQueries({
+//         queryKey: ['joinedCommunities'],
+//         exact: true
+//       });
+      
+//       // Update all communities cache to reflect new member count
+//       queryClient.invalidateQueries({
+//         queryKey: ['communities'],
+//         refetchType: 'active'
+//       });
+      
+//       toast.success('Left community successfully!');
+//     },
+//     onError: (error: any, communityId, context) => {
+//       console.error('Leave mutation failed:', {
+//         error,
+//         communityId,
+//         errorMessage: error?.message
+//       });
+      
+//       // Revert optimistic updates
+//       if (context?.previousJoinedCommunities) {
+//         queryClient.setQueryData(['joinedCommunities'], context.previousJoinedCommunities);
+//       }
+      
+//       const errorMessage = error?.response?.data?.message || error?.message || 'Failed to leave community. Please try again.';
+//       toast.error(errorMessage);
+//     },
+//     onSettled: (data, error, communityId) => {
+//       console.log('Leave mutation completed:', {
+//         success: !error,
+//         communityId
+//       });
+//     }
+//   });
+// };
+
 export const useCreatePost = () => {
   const queryClient = useQueryClient();
   

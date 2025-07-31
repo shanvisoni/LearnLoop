@@ -1,19 +1,9 @@
-// import { IsOptional, IsUrl } from 'class-validator';
-
-// export class UpdateUserDto {
-//   @IsOptional()
-//   @IsUrl()
-//   avatarUrl?: string;
-// }
-
-// update-user.dto.ts
 import {
   IsOptional,
   IsString,
   IsUrl,
   MinLength,
   MaxLength,
-  IsEmail,
 } from 'class-validator';
 
 export class UpdateUserDto {

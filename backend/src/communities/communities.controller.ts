@@ -1,104 +1,3 @@
-// import {
-//   Controller,
-//   Get,
-//   Post,
-//   Body,
-//   Patch,
-//   Param,
-//   Delete,
-//   UseGuards,
-//   Query,
-//   Request,
-//   UnauthorizedException,
-// } from '@nestjs/common';
-// import { CommunitiesService } from './communities.service';
-// import { CreateCommunityDto } from './dto/create-community.dto';
-// import { UpdateCommunityDto } from './dto/update-community.dto';
-// import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-
-// @Controller('communities')
-// export class CommunitiesController {
-//   constructor(private readonly communitiesService: CommunitiesService) {}
-
-//   // @Post()
-//   // @UseGuards(JwtAuthGuard)
-//   // create(@Body() createCommunityDto: CreateCommunityDto, @Request() req) {
-//   //    console.log('JWT User ID:', req.user.id);
-//   //    console.log('JWT User sub:', req.user.sub);
-//   //    console.log('Full JWT user object:', req.user);
-//   //   return this.communitiesService.create(createCommunityDto, req.user.id);
-//   // }
-
-//   @Post()
-//   @UseGuards(JwtAuthGuard)
-//   create(@Body() createCommunityDto: CreateCommunityDto, @Request() req) {
-//     console.log('req.user:', req.user);
-//     console.log('req.user.id:', req.user.id);
-//     console.log('req.user._id:', req.user._id);
-
-//     const userId = req.user._id?.toString() || req.user.id;
-//     return this.communitiesService.create(createCommunityDto, userId);
-//   }
-
-//   @Get()
-//   findAll(
-//     @Query('search') search?: string,
-//     @Query('page') page?: number,
-//     @Query('limit') limit?: number,
-//   ) {
-//     return this.communitiesService.findAll(search, page, limit);
-//   }
-
-//   @Get('my-communities')
-//   @UseGuards(JwtAuthGuard)
-//   getMyCreatedCommunities(@Request() req) {
-//     return this.communitiesService.getMyCreatedCommunities(req.user.userId);
-//   }
-
-//   @Get('joined-communities')
-//   @UseGuards(JwtAuthGuard)
-//   getJoinedCommunities(@Request() req) {
-//     return this.communitiesService.getJoinedCommunities(req.user.userId);
-//   }
-
-//   @Get(':id')
-//   findOne(@Param('id') id: string) {
-//     return this.communitiesService.findOne(id);
-//   }
-
-//   @Patch(':id')
-//   @UseGuards(JwtAuthGuard)
-//   update(
-//     @Param('id') id: string,
-//     @Body() updateCommunityDto: UpdateCommunityDto,
-//     @Request() req,
-//   ) {
-//     return this.communitiesService.update(
-//       id,
-//       updateCommunityDto,
-//       req.user.userId,
-//     );
-//   }
-
-//   @Delete(':id')
-//   @UseGuards(JwtAuthGuard)
-//   remove(@Param('id') id: string, @Request() req) {
-//     return this.communitiesService.remove(id, req.user.userId);
-//   }
-
-//   @Post(':id/join')
-//   @UseGuards(JwtAuthGuard)
-//   joinCommunity(@Param('id') id: string, @Request() req) {
-//     return this.communitiesService.joinCommunity(id, req.user.userId);
-//   }
-
-//   @Post(':id/leave')
-//   @UseGuards(JwtAuthGuard)
-//   leaveCommunity(@Param('id') id: string, @Request() req) {
-//     return this.communitiesService.leaveCommunity(id, req.user.userId);
-//   }
-// }
-
 import {
   Controller,
   Get,
@@ -171,12 +70,6 @@ export class CommunitiesController {
     @Body() updateCommunityDto: UpdateCommunityDto,
     @Request() req,
   ) {
-    console.log('Update request - req.user:', req.user);
-    console.log('Update request - req.user.id:', req.user.id);
-    console.log('Update request - community ID:', id);
-    console.log('Update request - DTO:', updateCommunityDto);
-
-    // Fix: Use req.user.id instead of req.user.userId
     return this.communitiesService.update(id, updateCommunityDto, req.user.id);
   }
 
@@ -217,3 +110,169 @@ export class CommunitiesController {
     return this.communitiesService.leaveCommunity(id, req.user.id);
   }
 }
+
+// import {
+//   Controller,
+//   Get,
+//   Post,
+//   Body,
+//   Patch,
+//   Param,
+//   Delete,
+//   UseGuards,
+//   Query,
+//   Request,
+// } from '@nestjs/common';
+// import { CommunitiesService } from './communities.service';
+// import { CreateCommunityDto } from './dto/create-community.dto';
+// import { UpdateCommunityDto } from './dto/update-community.dto';
+// import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+// import { ResponseUtil } from '../common/utils/response.util';
+
+// @Controller('communities')
+// export class CommunitiesController {
+//   constructor(private readonly communitiesService: CommunitiesService) {}
+
+//   @Post()
+//   @UseGuards(JwtAuthGuard)
+//   async create(@Body() createCommunityDto: CreateCommunityDto, @Request() req) {
+//     const userId = req.user.id;
+//     const community = await this.communitiesService.create(
+//       createCommunityDto,
+//       userId,
+//     );
+//     return ResponseUtil.created(community, 'Community created successfully');
+//   }
+
+//   @Get()
+//   async findAll(
+//     @Query('search') search?: string,
+//     @Query('page') page?: number,
+//     @Query('limit') limit?: number,
+//   ) {
+//     const result = await this.communitiesService.findAll(search, page, limit);
+//     return ResponseUtil.paginated(
+//       result.communities,
+//       page || 1,
+//       limit || 10,
+//       result.total,
+//       'Communities retrieved successfully',
+//     );
+//   }
+
+//   @Get('my-communities')
+//   @UseGuards(JwtAuthGuard)
+//   async getMyCreatedCommunities(@Request() req) {
+//     const communities = await this.communitiesService.getMyCreatedCommunities(
+//       req.user.id,
+//     );
+//     return ResponseUtil.success(
+//       communities,
+//       'Created communities retrieved successfully',
+//     );
+//   }
+
+//   @Get('joined-communities')
+//   @UseGuards(JwtAuthGuard)
+//   async getJoinedCommunities(@Request() req) {
+//     const communities = await this.communitiesService.getJoinedCommunities(
+//       req.user.id,
+//     );
+//     return ResponseUtil.success(
+//       communities,
+//       'Joined communities retrieved successfully',
+//     );
+//   }
+
+//   @Get(':id/stats')
+//   async getCommunityStats(@Param('id') id: string) {
+//     const stats = await this.communitiesService.getCommunityState(id);
+//     return ResponseUtil.success(
+//       stats,
+//       'Community statistics retrieved successfully',
+//     );
+//   }
+
+//   @Get(':id')
+//   async findOne(@Param('id') id: string) {
+//     const community = await this.communitiesService.findOne(id);
+//     return ResponseUtil.success(community, 'Community retrieved successfully');
+//   }
+
+//   @Patch(':id')
+//   @UseGuards(JwtAuthGuard)
+//   async update(
+//     @Param('id') id: string,
+//     @Body() updateCommunityDto: UpdateCommunityDto,
+//     @Request() req,
+//   ) {
+//     const community = await this.communitiesService.update(
+//       id,
+//       updateCommunityDto,
+//       req.user.id,
+//     );
+//     return ResponseUtil.updated(community, 'Community updated successfully');
+//   }
+
+//   @Delete(':id')
+//   @UseGuards(JwtAuthGuard)
+//   async remove(@Param('id') id: string, @Request() req) {
+//     await this.communitiesService.remove(id, req.user.id);
+//     return ResponseUtil.deleted('Community deleted successfully');
+//   }
+
+//   @Get(':id/members')
+//   async getCommunityMembers(
+//     @Param('id') id: string,
+//     @Query('page') page?: number,
+//     @Query('limit') limit?: number,
+//   ) {
+//     const result = await this.communitiesService.getCommunityMembers(
+//       id,
+//       page,
+//       limit,
+//     );
+//     return ResponseUtil.paginated(
+//       result.members,
+//       page || 1,
+//       limit || 10,
+//       result.total,
+//       'Community members retrieved successfully',
+//     );
+//   }
+
+//   @Get(':id/members/:userId')
+//   async getMemberProfile(
+//     @Param('id') communityId: string,
+//     @Param('userId') userId: string,
+//   ) {
+//     const member = await this.communitiesService.getMemberProfile(
+//       communityId,
+//       userId,
+//     );
+//     return ResponseUtil.success(
+//       member,
+//       'Member profile retrieved successfully',
+//     );
+//   }
+
+//   @Post(':id/join')
+//   @UseGuards(JwtAuthGuard)
+//   async joinCommunity(@Param('id') id: string, @Request() req) {
+//     const community = await this.communitiesService.joinCommunity(
+//       id,
+//       req.user.id,
+//     );
+//     return ResponseUtil.success(community, 'Successfully joined community');
+//   }
+
+//   @Post(':id/leave')
+//   @UseGuards(JwtAuthGuard)
+//   async leaveCommunity(@Param('id') id: string, @Request() req) {
+//     const community = await this.communitiesService.leaveCommunity(
+//       id,
+//       req.user.id,
+//     );
+//     return ResponseUtil.success(community, 'Successfully left community');
+//   }
+// }

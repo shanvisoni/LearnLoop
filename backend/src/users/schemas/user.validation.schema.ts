@@ -1,6 +1,3 @@
-// import { CreateUserDto } from '../../users/dto/create-user.dto';
-
-// export class RegisterDto extends CreateUserDto {}
 import {
   IsEmail,
   IsNotEmpty,
@@ -13,7 +10,7 @@ import {
   IsAlpha,
 } from 'class-validator';
 
-export class RegisterDto {
+export class UserValidationSchema {
   @IsNotEmpty({ message: 'Username is required' })
   @MinLength(3, { message: 'Username must be at least 3 characters long' })
   @MaxLength(20, { message: 'Username cannot exceed 20 characters' })
@@ -27,12 +24,12 @@ export class RegisterDto {
   email: string;
 
   @IsNotEmpty({ message: 'Password is required' })
-  @MinLength(4, { message: 'Password must be at least 4 characters long' })
-  @MaxLength(10, { message: 'Password cannot exceed 10 characters' })
-  //   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-  //     message:
-  //       'Password must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number or special character',
-  //   })
+  @MinLength(8, { message: 'Password must be at least 8 characters long' })
+  @MaxLength(50, { message: 'Password cannot exceed 50 characters' })
+  @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
+    message:
+      'Password must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number or special character',
+  })
   password: string;
 
   @IsNotEmpty({ message: 'First name is required' })
