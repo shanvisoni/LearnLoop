@@ -391,7 +391,7 @@ const RegisterPage = () => {
         <div className="text-center space-y-4">
           <Link to={ROUTES.HOME} className="inline-flex items-center space-x-2 text-blue-600">
             <BookOpen className="h-8 w-8" />
-            <span className="text-2xl font-bold">Reactify</span>
+            <span className="text-2xl font-bold">Trackademy</span>
           </Link>
           <div className="space-y-2">
             <h1 className="text-3xl font-bold text-gray-900">
