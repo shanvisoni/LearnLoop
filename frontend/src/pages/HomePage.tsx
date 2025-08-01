@@ -72,7 +72,7 @@ const HomePage = () => {
                 <div className="flex items-center space-x-3">
                   <Link to={ROUTES.LOGIN}>
                     <Button variant="ghost" className="hover:bg-blue-50">
-                      Login
+                      Register/Login
                     </Button>
                   </Link>
                   <Link to={ROUTES.REGISTER}>
