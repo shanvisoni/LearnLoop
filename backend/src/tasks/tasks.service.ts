@@ -1,132 +1,3 @@
-// import {
-//   Injectable,
-//   NotFoundException,
-//   ForbiddenException,
-//   Logger,
-// } from '@nestjs/common';
-// import { InjectModel } from '@nestjs/mongoose';
-// import { Model, Types } from 'mongoose';
-// import { Task, TaskDocument } from './schemas/task.schema';
-// import { CreateTaskDto } from './dto/create-task.dto';
-// import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
-// import { UpdateTaskDto } from './dto/update-task.dto';
-// import { ERROR_MESSAGES } from 'src/common/constants/error-messages.constants';
-
-// @Injectable()
-// export class TasksService {
-//   private readonly logger = new Logger(TasksService.name);
-
-//   constructor(@InjectModel(Task.name) private taskModel: Model<TaskDocument>) {}
-
-//   async create(createTaskDto: CreateTaskDto, userId: string): Promise<Task> {
-
-//     if (!userId) {
-//       throw new Error('User ID is required');
-//     }
-
-//     if (!Types.ObjectId.isValid(userId)) {
-//       throw new Error('Invalid user ID format');
-//     }
-
-//     const userObjectId = new Types.ObjectId(userId);
-
-//     const createdTask = new this.taskModel({
-//       ...createTaskDto,
-//       userId: userObjectId,
-//     });
-
-//     const savedTask = await createdTask.save();
-//     return savedTask;
-//   }
-
-//   async findAllByUser(userId: string): Promise<Task[]> {
-//     const userObjectId = new Types.ObjectId(userId);
-//     return this.taskModel
-//       .find({ userId: userObjectId })
-//       .sort({ createdAt: -1 })
-//       .exec();
-//   }
-
-//   async findOne(
-//     id: string,
-//     userId: string | Types.ObjectId,
-//   ): Promise<TaskDocument> {
-
-//     const task = await this.taskModel.findById(id).exec();
-
-//     if (!task) {
-//       throw new NotFoundException('Task not found');
-//     }
-
-//     const taskUserId = task.userId.toString();
-//     const requestUserId =
-//       userId instanceof Types.ObjectId ? userId.toString() : userId;
-
-//     if (taskUserId !== requestUserId) {
-//       throw new ForbiddenException('Access denied');
-//     }
-
-//     return task;
-//   }
-
-//   async update(
-//     id: string,
-//     updateTaskDto: UpdateTaskDto,
-//     userId: string | Types.ObjectId,
-//   ): Promise<TaskDocument> {
-//     const task = await this.findOne(id, userId);
-
-//     const updatedTask = await this.taskModel
-//       .findByIdAndUpdate(id, updateTaskDto, { new: true, runValidators: true })
-//       .exec();
-//     this.logger.log('[DEBUG] Updated task:', updatedTask);
-//     if (!updatedTask) {
-//       throw new NotFoundException('Task not found');
-//     }
-//     return updatedTask;
-//   }
-
-//   async updateStatus(
-//     taskId: string,
-//     updateData: UpdateTaskStatusDto,
-//     userId: string,
-//   ) {
-//     const updatedTask = await this.taskModel.findOneAndUpdate(
-//       {
-//         _id: new Types.ObjectId(taskId),
-//         userId: new Types.ObjectId(userId),
-//       },
-//       { status: updateData.status },
-//       { new: true },
-//     );
-
-//     if (!updatedTask) {
-//       throw new NotFoundException('Task not found or not owned by user');
-//     }
-
-//     return updatedTask;
-//   }
-
-//   async remove(id: string, userId: string): Promise<void> {
-//     const task = await this.findOne(id, userId);
-//     await this.taskModel.findByIdAndDelete(id).exec();
-//   }
-
-//   async getTaskStats(userId: string) {
-//     const userObjectId = new Types.ObjectId(userId);
-//     const tasks = await this.taskModel.find({ userId: userObjectId }).exec();
-
-//     const stats = {
-//       total: tasks.length,
-//       pending: tasks.filter((task) => task.status === 'pending').length,
-//       inProgress: tasks.filter((task) => task.status === 'in_progress').length,
-//       completed: tasks.filter((task) => task.status === 'completed').length,
-//     };
-
-//     return stats;
-//   }
-// }
-
 import {
   Injectable,
   NotFoundException,
@@ -222,7 +93,7 @@ export class TasksService {
     userId: string | Types.ObjectId,
   ): Promise<TaskDocument> {
     try {
-      await this.findOne(id, userId); // This will verify ownership
+      await this.findOne(id, userId);
 
       const updatedTask = await this.taskModel
         .findByIdAndUpdate(id, updateTaskDto, {
@@ -279,7 +150,7 @@ export class TasksService {
 
   async remove(id: string, userId: string): Promise<void> {
     try {
-      await this.findOne(id, userId); // This will verify ownership
+      await this.findOne(id, userId);
       const result = await this.taskModel.findByIdAndDelete(id).exec();
 
       if (!result) {

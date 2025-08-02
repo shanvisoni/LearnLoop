@@ -1,6 +1,3 @@
-// import { CreateUserDto } from '../../users/dto/create-user.dto';
-
-// export class RegisterDto extends CreateUserDto {}
 import {
   IsEmail,
   IsNotEmpty,
@@ -46,20 +43,4 @@ export class RegisterDto {
   @MaxLength(50, { message: 'Last name cannot exceed 50 characters' })
   @IsAlpha('en-US', { message: 'Last name can only contain letters' })
   lastName: string;
-
-  // @IsNotEmpty({ message: 'Country is required' })
-  // @IsString({ message: 'Country must be a valid string' })
-  // @MinLength(2, { message: 'Country name must be at least 2 characters long' })
-  // @MaxLength(100, { message: 'Country name cannot exceed 100 characters' })
-  // country: string;
-
-  // @IsNotEmpty({ message: 'Country code is required' })
-  // @IsString({ message: 'Country code must be a valid string' })
-  // @Length(2, 3, {
-  //   message: 'Country code must be 2-3 characters (e.g., US, IN, UK)',
-  // })
-  // @Matches(/^[A-Z]{2,3}$/, {
-  //   message: 'Country code must be uppercase letters only (e.g., US, IN, UK)',
-  // })
-  // countryCode: string;
 }

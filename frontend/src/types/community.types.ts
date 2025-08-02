@@ -1,4 +1,3 @@
-// src/types/community.types.ts
 export interface User {
   _id: string;
   username: string;

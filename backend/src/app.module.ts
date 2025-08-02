@@ -13,7 +13,7 @@ import { AppService } from './app.service';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env', // Explicitly specify your env file
+      envFilePath: '.env',
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],

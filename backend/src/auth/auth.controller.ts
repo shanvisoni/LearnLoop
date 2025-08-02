@@ -35,33 +35,9 @@ export class AuthController {
   @Get('profile')
   @UseGuards(JwtAuthGuard)
   async getProfile(@Request() req) {
-    // req.user comes from the JWT strategy validate method
     return {
       success: true,
       user: req.user,
     };
   }
-
-  //----------forgot password related stuff------------
-
-  //   @Post('forgot-password')
-  //   @HttpCode(HttpStatus.OK)
-  //   async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
-  //     await this.authService.forgotPassword(forgotPasswordDto);
-  //     return {
-  //       success: true,
-  //       message:
-  //         'If your email exists in our system, you will receive a password reset link',
-  //     };
-  //   }
-
-  //   @Post('reset-password')
-  //   @HttpCode(HttpStatus.OK)
-  //   async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
-  //     await this.authService.resetPassword(resetPasswordDto);
-  //     return {
-  //       success: true,
-  //       message: 'Password reset successfully',
-  //     };
-  //   }
 }

@@ -97,12 +97,6 @@ const CommunityDetailPage: React.FC = () => {
     try {
       await createPostMutation.mutateAsync(createPostDto);
 
-      // await Promise.all([
-      //   queryClient.invalidateQueries({queryKey:['community',id]}),
-      //   queryClient.invalidateQueries({queryKey:['communityStats',id]}),
-      //   queryClient.invalidateQueries({queryKey:['community-posts',id]}),
-      // ]);
-
       setPostData({ title: '', content: '' });
       setShowCreatePost(false);
       setActiveTab('posts');
@@ -112,8 +106,7 @@ const CommunityDetailPage: React.FC = () => {
   };
 
   const handleMemberClick = (member: User) => {
-    // setSelectedMember(member);
-    // You could open a modal or navigate to member profile
+
     console.log('Selected member:', member);
   };
 

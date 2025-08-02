@@ -1,9 +1,5 @@
 import api from './api';
 import type { LoginRequest, RegisterRequest, AuthResponse,
-  // ForgotPasswordRequest, 
-  // ResetPasswordRequest, 
-  // ForgotPasswordResponse, 
-  // ResetPasswordResponse 
  } from '../types/auth.types';
 
 export const authService = {
@@ -27,13 +23,4 @@ export const authService = {
     localStorage.removeItem('token');
   },
 
-  // forgotPassword: async(data: ForgotPasswordRequest): Promise<ForgotPasswordResponse> =>{
-  //   const response = await api.post('/auth/forgot-password',data);
-  //   return response.data;
-  // },
-
-  // resetPassword: async ( data: ResetPasswordRequest): Promise<ResetPasswordResponse> =>{
-  //   const response=await api.post('/auth/reset-password', data);
-  //   return response.data;
-  // },
 };

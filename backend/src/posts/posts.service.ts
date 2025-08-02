@@ -2,7 +2,6 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
-  BadRequestException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
@@ -20,7 +19,6 @@ export class PostsService {
   ) {}
 
   async create(createPostDto: CreatePostDto, userId: string): Promise<Post> {
-    // Check if user is a member of the community
     const isMember = await this.communitiesService.isMember(
       createPostDto.communityId,
       userId,
@@ -116,10 +114,8 @@ export class PostsService {
     );
 
     if (userLikedIndex > -1) {
-      // User has already liked, so unlike
       post.likes.splice(userLikedIndex, 1);
     } else {
-      // User hasn't liked, so like
       post.likes.push(userId as any);
     }
 
@@ -137,7 +133,6 @@ export class PostsService {
       throw new NotFoundException('Post not found');
     }
 
-    // Check if user is a member of the community
     const isMember = await this.communitiesService.isMember(
       post.communityId.toString(),
       userId,

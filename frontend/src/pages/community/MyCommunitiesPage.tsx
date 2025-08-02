@@ -1,4 +1,3 @@
-// src/pages/community/MyCommunities.tsx
 import React, { useState } from 'react';
 import { Users, Calendar, Settings, Eye, UserPlus, Lock, Globe } from 'lucide-react';
 import { useMyCreatedCommunities, useDeleteCommunity } from '../../hooks/useCommunities';

@@ -18,11 +18,7 @@ export const registerSchema = z.object({
     .min(1, 'Password is required')
     .min(4, 'Password must be at least 4 characters long')
     .max(10, 'Password cannot exceed 10 characters'),
-    // .regex(
-    //   /((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/,
-    //   'Password must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number or special character'
-    // ),
-  
+
   firstName: z
     .string()
     .min(1, 'First name is required')
@@ -36,18 +32,6 @@ export const registerSchema = z.object({
     .min(2, 'Last name must be at least 2 characters long')
     .max(50, 'Last name cannot exceed 50 characters')
     .regex(/^[a-zA-Z]+$/, 'Last name can only contain letters'),
-  
-  // country: z
-  //   .string()
-  //   .min(1, 'Country is required')
-  //   .min(2, 'Country name must be at least 2 characters long')
-  //   .max(100, 'Country name cannot exceed 100 characters'),
-  
-  // countryCode: z
-  //   .string()
-  //   .min(1, 'Country code is required')
-  //   .length(2, 'Country code must be exactly 2 characters')
-  //   .regex(/^[A-Z]{2}$/, 'Country code must be uppercase letters only'),
 });
 
 export const loginSchema = z.object({

@@ -21,7 +21,7 @@ const CommunitiesPage: React.FC = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedQuery(searchQuery);
-      setCurrentPage(1); // Reset to first page on new search
+      setCurrentPage(1); 
     }, 500);
 
     return () => clearTimeout(timer);
@@ -73,17 +73,6 @@ const CommunitiesPage: React.FC = () => {
 
   // Get current user ID (you might need to adjust this based on your auth implementation)
   const currentUserId = localStorage.getItem('userId') || undefined;
-
-  // Handle join/leave callbacks
-  // const handleJoin = (communityId: string) => {
-  //   console.log('Joined community:', communityId);
-  //   // Optionally trigger a refetch or update local state
-  // };
-
-  // const handleLeave = (communityId: string) => {
-  //   console.log('Left community:', communityId);
-  //   // Optionally trigger a refetch or update local state
-  // };
 
   // Pagination handlers
   const goToPage = (page: number) => {
@@ -193,8 +182,7 @@ const CommunitiesPage: React.FC = () => {
             communities={currentCommunities}
             isLoading={isLoading}
             currentUserId={currentUserId}
-            // onJoin={handleJoin}
-            // onLeave={handleLeave}
+
             showActions={true}
             emptyMessage={
               searchQuery || selectedTags.length > 0 || !showPrivate

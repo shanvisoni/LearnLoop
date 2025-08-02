@@ -27,17 +27,6 @@ const JoinedCommunitiesPage: React.FC = () => {
     }
   };
 
-//   // Handle community card click - navigate to community details
-//   const handleCommunityClick = (communityId: string) => {
-//     navigate(`/communities/${communityId}`);
-//   };
-
-//   // Handle viewing community posts
-//   const handleViewPosts = (communityId: string) => {
-//     navigate(`/communities/${communityId}/posts`);
-//   };
-
-  // Error state
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">

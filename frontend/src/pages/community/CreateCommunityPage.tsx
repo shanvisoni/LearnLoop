@@ -10,15 +10,7 @@ const CreateCommunityPage: React.FC = () => {
 
   const handleSubmit = async (data: CreateCommunityDto | UpdateCommunityDto) => {
     try {
-      // Since we're creating, we know it's CreateCommunityDto
       const newCommunity = await createMutation.mutateAsync(data as CreateCommunityDto);
-      // Navigate to the newly created community details page
-
-      // navigate(`/communities/${newCommunity._id}`, { 
-      //   replace: true,
-      //   state: { message: 'Community created successfully!' }
-      // });
-
        navigate('/communities', { 
         replace: true,
         state: { 
@@ -27,14 +19,12 @@ const CreateCommunityPage: React.FC = () => {
         }
       });
     } catch (error) {
-      // Error is already handled by the mutation hook with toast
       console.error('Failed to create community:', error);
     }
   };
 
   const handleCancel = () => {
-    // Navigate back to communities view page
-    // navigate('/communities/view');
+
         navigate('/dashboard');
 
   };

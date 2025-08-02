@@ -16,7 +16,6 @@ import {
   Loader2
 } from 'lucide-react';
 
-// Import your actual types and services
 import {
   type Task,
   type CreateTaskRequest,
@@ -81,18 +80,6 @@ const TaskPage: React.FC = () => {
     }
   };
 
-//   const handleCreateTask = async (taskData: CreateTaskRequest | UpdateTaskRequest) => {
-//   try {
-//     console.log('handleCreateTask called with:', taskData); // Debug log
-//     await createTask(taskData as CreateTaskRequest);
-//     console.log('Task created successfully, closing modal'); // Debug log
-//     setIsCreateModalOpen(false);
-//   } catch (err) {
-//     console.error('Failed to create task:', err);
-//     // Don't close modal on error so user can retry
-//     // You might want to show an error message to the user here
-//   }
-// };
   const handleUpdateTask = async (taskData: UpdateTaskRequest) => {
     if (!selectedTask) return;
     
@@ -105,21 +92,7 @@ const TaskPage: React.FC = () => {
     }
   };
 
-//   const handleUpdateTask = async (taskData: UpdateTaskRequest) => {
-//   if (!selectedTask) return;
-  
-//   try {
-//     console.log('handleUpdateTask called with:', taskData); // Debug log
-//     await updateTask(selectedTask._id, taskData);
-//     console.log('Task updated successfully, closing modal'); // Debug log
-//     setIsEditModalOpen(false);
-//     setSelectedTask(null);
-//   } catch (err) {
-//     console.error('Failed to update task:', err);
-//     // Don't close modal on error so user can retry
-//   }
-// };
-  const handleDeleteTask = async (taskId: string) => {
+const handleDeleteTask = async (taskId: string) => {
     try {
       await deleteTask(taskId);
     } catch (err) {
@@ -474,19 +447,6 @@ const TaskCard: React.FC<{
   );
 };
 
-// Task Modal Component
-// const TaskModal: React.FC<{
-//   title: string;
-//   task?: Task;
-//   onClose: () => void;
-//   onSubmit: (task: CreateTaskRequest | UpdateTaskRequest) => void;
-// }> = ({ title, task, onClose, onSubmit }) => {
-//   const [formData, setFormData] = useState({
-//     title: task?.title || '',
-//     description: task?.description || '',
-//     priority: task?.priority || TaskPriority.MEDIUM,
-//     dueDate: task?.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '',
-//   });
 
 const TaskModal: React.FC<{
   title: string;
@@ -501,22 +461,10 @@ const TaskModal: React.FC<{
     dueDate: task?.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '',
   });
    const [isSubmitting, setIsSubmitting] = useState(false);
-  // const handleSubmit = (e: React.FormEvent) => {
-  //   e.preventDefault();
-    
-  //   const submitData = {
-  //     title: formData.title,
-  //     description: formData.description || undefined,
-  //     priority: formData.priority,
-  //     dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
-  //   };
-
-  //   onSubmit(submitData);
-  // };
 
     const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    e.stopPropagation(); // Prevent event bubbling
+    e.stopPropagation(); 
     
     // Prevent multiple submissions
     if (isSubmitting) {
@@ -545,13 +493,7 @@ const TaskModal: React.FC<{
       setIsSubmitting(false);
     }
   };
-//  const handleBackdropClick = (e: React.MouseEvent) => {
-//     if (e.target === e.currentTarget) {
-//       onClose();
-//     }
-//   };
 
-  // Handle escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {

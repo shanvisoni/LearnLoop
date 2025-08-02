@@ -1,4 +1,3 @@
-// src/services/post.service.ts
 import api  from './api';
 import type{
   Post,

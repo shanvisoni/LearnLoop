@@ -19,7 +19,6 @@ export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserDocument> {
-    // Check if user already exists
     const existingUser = await this.userModel.findOne({
       $or: [
         { email: createUserDto.email },
@@ -33,14 +32,12 @@ export class UsersService {
       );
     }
 
-    // Hash password
     const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || '12');
     const hashedPassword = await bcrypt.hash(
       createUserDto.password,
       saltRounds,
     );
 
-    // Create user
     const createdUser = new this.userModel({
       ...createUserDto,
       password: hashedPassword,
@@ -65,7 +62,6 @@ export class UsersService {
     return user;
   }
 
-  // Get user profile (without password)
   async getUserProfile(id: string): Promise<UserProfileDto> {
     const user = await this.userModel
       .findById(id)
@@ -98,7 +94,6 @@ export class UsersService {
     };
   }
 
-  // Update user profile
   async updateProfile(
     id: string,
     updateUserDto: UpdateUserDto,
@@ -108,12 +103,9 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    // Update user fields
     Object.assign(user, updateUserDto);
     return user.save();
   }
-
-  // Change password
   async changePassword(
     id: string,
     changePasswordDto: ChangePasswordDto,
@@ -123,7 +115,6 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    // Verify current password
     const isCurrentPasswordValid = await bcrypt.compare(
       changePasswordDto.currentPassword,
       user.password,
@@ -133,19 +124,16 @@ export class UsersService {
       throw new UnauthorizedException('Current password is incorrect');
     }
 
-    // Hash new password
     const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || '12');
     const hashedNewPassword = await bcrypt.hash(
       changePasswordDto.newPassword,
       saltRounds,
     );
 
-    // Update password
     user.password = hashedNewPassword;
     await user.save();
   }
 
-  // Search users by username (for community features)
   async searchUsers(
     query: string,
     limit: number = 10,
@@ -178,7 +166,6 @@ export class UsersService {
     }));
   }
 
-  // Add community to user's joined communities
   async joinCommunity(userId: string, communityId: string): Promise<void> {
     const user = await this.userModel.findById(userId);
     if (!user) {
@@ -192,7 +179,6 @@ export class UsersService {
     }
   }
 
-  // Remove community from user's joined communities
   async leaveCommunity(userId: string, communityId: string): Promise<void> {
     const user = await this.userModel.findById(userId);
     if (!user) {
@@ -205,7 +191,6 @@ export class UsersService {
     await user.save();
   }
 
-  // Add created community to user
   async addCreatedCommunity(
     userId: string,
     communityId: string,
@@ -228,79 +213,4 @@ export class UsersService {
   ): Promise<boolean> {
     return bcrypt.compare(plainPassword, hashedPassword);
   }
-
-  //----------------------------forgot password stuff------------------------
-  // users.service.ts - add these methods
-  // async setResetPasswordToken(email: string, token: string): Promise<void> {
-  //   const user = await this.userModel.findOne({ email });
-  //   if (!user) {
-  //     throw new NotFoundException('User not found');
-  //   }
-
-  //   user.resetPasswordToken = token;
-  //   user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour from now
-  //   await user.save();
-  // }
-
-  // async findByResetToken(token: string): Promise<User | null> {
-  //   return this.userModel.findOne({
-  //     resetPasswordToken: token,
-  //     resetPasswordExpires: { $gt: new Date() }, // Token not expired
-  //   });
-  // }
-
-  // async resetPassword(token: string, newPassword: string): Promise<void> {
-  //   const user = await this.findByResetToken(token);
-  //   if (!user) {
-  //     throw new UnauthorizedException('Invalid or expired reset token');
-  //   }
-
-  //   // Hash new password
-  //   const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || '12');
-  //   const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
-
-  //   // Update password and clear reset token
-  //   user.password = hashedPassword;
-  //   user.resetPasswordToken = undefined;
-  //   user.resetPasswordExpires = undefined;
-  //   await user.save();
-  // }
-
-  // async setResetPasswordToken(email: string, token: string): Promise<void> {
-  //   const result = await this.userModel.findOneAndUpdate(
-  //     { email },
-  //     {
-  //       resetPasswordToken: token,
-  //       resetPasswordExpires: new Date(Date.now() + 3600000),
-  //     },
-  //     { new: true },
-  //   );
-
-  //   if (!result) {
-  //     throw new NotFoundException('User not found');
-  //   }
-  // }
-
-  // async resetPassword(token: string, newPassword: string): Promise<void> {
-  //   const user = await this.findByResetToken(token);
-  //   if (!user) {
-  //     throw new UnauthorizedException('Invalid or expired reset token');
-  //   }
-
-  //   // Hash new password
-  //   const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || '12');
-  //   const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
-  //   const userId = (user as any)._id.toString();
-  //   // Update password and clear reset token using findOneAndUpdate
-  //   await this.userModel.findOneAndUpdate(
-  //     { _id: userId },
-  //     {
-  //       password: hashedPassword,
-  //       $unset: {
-  //         resetPasswordToken: 1,
-  //         resetPasswordExpires: 1,
-  //       },
-  //     },
-  //   );
-  // }
 }

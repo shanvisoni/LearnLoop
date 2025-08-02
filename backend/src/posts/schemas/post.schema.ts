@@ -1,4 +1,3 @@
-// src/posts/schemas/post.schema.ts
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
@@ -6,7 +5,7 @@ export type PostDocument = Post & Document;
 
 @Schema({ timestamps: true })
 export class Comment {
-  @Prop({ type: Types.ObjectId, auto: true }) // ✅ Add this line
+  @Prop({ type: Types.ObjectId, auto: true })
   _id: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })

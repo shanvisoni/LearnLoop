@@ -7,8 +7,6 @@ import { ROUTES } from './utils/constants';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
-// import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
-// import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import DashboardPage from './pages/dashboard/DashboardPage';
 import ProfilePage from './pages/profile/ProfilePage';
 import TasksPage from './pages/tasks/TasksPage';
@@ -17,9 +15,7 @@ import CommunityDetailPage from './pages/community/CommunityDetailPage';
 import CreateCommunityPage from './pages/community/CreateCommunityPage';
 import MyCommunitiesPage from './pages/community/MyCommunitiesPage';
 import JoinedCommunitiesPage from './pages/community/JoinedCommunitiesPage';
-// import ProfilePage from './pages/profile/ProfilePage';
 import EditCommunityPage from './components/community/EditCommunityPage';
-// Components
 import Layout from './components/layout/Layout';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import { ToastProvider } from '@radix-ui/react-toast';
